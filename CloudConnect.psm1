@@ -1,4 +1,25 @@
 Function Get-ServiceToken {
+    <#
+    .SYNOPSIS
+    Get a token for a given Microsoft Cloud Service
+
+    .DESCRIPTION
+    Returns an ADAL token for a given Microsoft Cloud Service
+    Will attempt to acquire the token silently (refresh) if possible
+
+    .LINK
+    https://github.com/Canthv0/CloudAuthModule
+
+    .OUTPUTS
+    Returns a token object for the requested cloud service
+
+    .EXAMPLE
+    Get-ServiceToken -Service EXO
+
+    Returns a token for the Exchange Online Service.
+
+    #>
+
     
     param (
         # Parameter help description
@@ -43,7 +64,7 @@ Function Get-ServiceToken {
     Write-Debug "Looking in token cache"
     $Result = $authContext.AcquireTokenSilentAsync($resourceAppIdURI, $clientId)
     
-    while ($result.IsCompleted -ne $true){ Start-Sleep -Milliseconds 500;write-debug "silent sleep"}
+    while ($result.IsCompleted -ne $true) { Start-Sleep -Milliseconds 500; write-debug "silent sleep" }
     
     # Check if we failed to get the token
     if (!($Result.IsFaulted -eq $false)) {
@@ -55,14 +76,14 @@ Function Get-ServiceToken {
                 Write-Information "Cache miss, asking for credentials"
                 $Result = $authContext.AcquireTokenAsync($resourceAppIdURI, $clientId, $redirectUri, $platformParameters)
                 
-                while ($result.IsCompleted -ne $true){ Start-Sleep -Milliseconds 500;write-debug "sleep"}
+                while ($result.IsCompleted -ne $true) { Start-Sleep -Milliseconds 500; write-debug "sleep" }
             }
             multiple_matching_tokens_detected {
                 # we could clear the cache here since we don't have a UPN, but we are just going to move on to prompting
                 Write-Information "Multiple matching entries found, asking for credentials"
                 $Result = $authContext.AcquireTokenAsync($resourceAppIdURI, $clientId, $redirectUri, $platformParameters)
                 
-                while ($result.IsCompleted -ne $true){ Start-Sleep -Milliseconds 500;write-debug "sleep"}
+                while ($result.IsCompleted -ne $true) { Start-Sleep -Milliseconds 500; write-debug "sleep" }
             }
             Default { Write-Error -Message "Unknown Token Error $Result.Exception.InnerException.ErrorCode" -ErrorAction Stop }
         }
@@ -80,6 +101,28 @@ Function Add-ADALType {
 }
 
 Function Get-TokenCache {
+
+    <#
+    .SYNOPSIS
+    Returns the current contents of the token cache
+
+    .DESCRIPTION
+    Returns basic properties about the objects currently in the token cache.
+    Returns the local time that the token will expire.
+
+    .LINK
+    https://github.com/Canthv0/CloudAuthModule
+
+    .OUTPUTS
+    List of the information in the token cache.
+
+    .EXAMPLE
+    Get-TokenCache
+
+    Displays the information currently in the token cache.
+
+    #>
+
 
     # Ensure our ADAL types are loaded and availble
     Add-ADALType
