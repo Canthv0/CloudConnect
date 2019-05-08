@@ -8,3 +8,6 @@ Exchange Online - Connect-EXO
 
 ### Known Issues:
 - New PSSession and Import must be done when refreshing the EXO token
+
+### License
+MIT License
