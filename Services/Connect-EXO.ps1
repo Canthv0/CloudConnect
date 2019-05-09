@@ -15,7 +15,7 @@ function Connect-EXO {
     When the token expires if the session is not refreshed the Exchange shell will attempt implict remoting that will prompt / fail
 
     .LINK
-    https://github.com/Canthv0/CloudAuthModule
+    https://github.com/Canthv0/CloudConnect
 
     .OUTPUTS
     None.  Creates a PS session to EXO and imports it into the global scope
@@ -30,6 +30,9 @@ function Connect-EXO {
     # Get the token from the service
     $Token = Get-ServiceToken -service exo
 
+    # Check for an existing PS Session to EXO and remove it
+    Get-PSSession -name exo* | Remove-PSSession -Confirm:$false
+
     # Build the auth information
     $Authorization = "Bearer {0}" -f $Token.Result.AccessToken
     $UserId = ($Token.Result.UserInfo.DisplayableId).tostring()
@@ -39,7 +42,7 @@ function Connect-EXO {
     $Credtoken = New-Object System.Management.Automation.PSCredential -ArgumentList $UserId, $Password
     
     # Create and import the session
-    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/PowerShell-LiveId?BasicAuthToOAuthConversion=true' -Credential $Credtoken -Authentication Basic -AllowRedirection -ErrorAction Stop
-    Import-Module (Import-PSSession $Session -AllowClobber) -Global
+    $Session = New-PSSession -Name EXO -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/PowerShell-LiveId?BasicAuthToOAuthConversion=true' -Credential $Credtoken -Authentication Basic -AllowRedirection -ErrorAction Stop
+    Import-Module (Import-PSSession $Session -AllowClobber) -Global -WarningAction 'SilentlyContinue'
 
 }
