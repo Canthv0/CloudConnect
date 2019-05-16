@@ -24,7 +24,7 @@ Function Get-ServiceToken {
     param (
         # Parameter help description
         [Parameter(Mandatory = $true)]
-        [ValidateSet("EXO")]
+        [ValidateSet("EXO","AzureGraph")]
         [string]
         $Service
     )
@@ -48,6 +48,16 @@ Function Get-ServiceToken {
             # Set Authority to Azure AD Tenant
             $authority = "https://login.windows.net/common"
 
+        }
+        AzureGraph {
+            # Azure PowerShell Client ID
+            $clientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+            # Set redirect URI for PowerShell
+            $redirectUri = "urn:ietf:wg:oauth:2.0:oob"
+            # Set Resource URI to EXO endpoint
+            $resourceAppIdURI = "https://graph.windows.net"
+            # Set Authority to Azure AD Tenant
+            $authority = "https://login.windows.net/common"            
         }
         Default { Write-Error "Service Not Implemented" -ErrorAction Stop }
     }
@@ -101,6 +111,9 @@ Function Add-ADALType {
 }
 
 Function Get-TokenCache {
+    param(
+        [Switch]$Full = $false
+    )
 
     <#
     .SYNOPSIS
@@ -126,8 +139,16 @@ Function Get-TokenCache {
 
     # Ensure our ADAL types are loaded and availble
     Add-ADALType
-        
+
     $cache = [Microsoft.IdentityModel.Clients.ActiveDirectory.TokenCache]::DefaultShared
-    $cache.ReadItems() | Select-Object DisplayableId, Authority, ClientId, Resource, @{Name = "ExpiresOn"; Expression = { $_.ExpiresOn.localdatetime } } | Format-List
+    
+    if ($full){
+        Return $Cache.ReadItems()
+    }
+    else {
+        $cache.ReadItems() | Select-Object DisplayableId, Authority, ClientId, Resource, @{Name = "ExpiresOn"; Expression = { $_.ExpiresOn.localdatetime } }
+    }
+    
+    
 
 }
