@@ -1,4 +1,4 @@
-Function Connect-EXOLegacy {
+Function Connect-SCCLegacy {
 
     <#
     .SYNOPSIS
