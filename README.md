@@ -1,10 +1,9 @@
+# This project has been depricated!!
+# The underlying module is no longer support by Microsoft
+# The code is being left here for historical reasons only
+
+
 # Project: Cloud Connect
-
-## Install
-The module is published to the PowerShell Gallery so it should be installed from there.
-https://www.powershellgallery.com/packages/CloudConnect/1.0.0
-
-Install-Module -Name CloudConnect
 
 ## Description:
 PS Module for connecting to Shell / Graph API using ADAL to multiple Microsoft Cloud Services (O365)
